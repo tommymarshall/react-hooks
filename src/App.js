@@ -19,19 +19,19 @@ const useTodos = (initialState) => {
   ]
 };
 
-const getTodos = () => fetch(
-      `https://jsonplaceholder.typicode.com/todos`
-    )
-    .then((res) => res.json())
-    .then((json) => json.slice(0, 8).map(({ title }) => title));
-
 const App = () => {
   const [input, setInput] = useState('Add new todo!')
   const [todos, { add, remove }] = useTodos([])
 
-  useEffect(() => {
-    getTodos().then((t) => add(t));
-  }, [])
+  const getTodos = async (add) => {
+    const res = await fetch(
+      `https://jsonplaceholder.typicode.com/todos`
+    )
+    const json = await res.json()
+    add(json.slice(0, 8).map(({ title }) => title));
+  };
+
+  useEffect(() => { getTodos(add) }, []);
 
   return (
     <div className="App">
