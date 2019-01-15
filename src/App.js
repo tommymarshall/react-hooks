@@ -5,7 +5,7 @@ const useTodos = (initialState) => {
   const [todos, setTodos] = useState(initialState);
 
   const add = (text) => {
-    setTodos([...todos, ...Array.isArray(text) ? [ ...text ] : [ text ]]);
+    setTodos([...todos, ...Array.isArray(text) ? [ ...text ] : [ { text, complete: false } ]]);
   }
 
   const remove = (index) => {
@@ -13,9 +13,14 @@ const useTodos = (initialState) => {
     setTodos(todos);
   }
 
+  const toggleComplete = (index) => {
+    todos[index].completed = !todos[index].completed;
+    setTodos(todos);
+  }
+
   return [
     todos,
-    { add, remove }
+    { add, remove, toggleComplete }
   ]
 };
 
@@ -37,7 +42,7 @@ const useFetch = (input, opts = defaultOpts) => {
         const body = await readBody(response);
         setData(body);
       } else {
-        setError(new Error(response.statusText));
+        setError(new Error("Bad URL probs"));
       }
     } catch (e) {
       setError(e);
@@ -53,21 +58,24 @@ const useFetch = (input, opts = defaultOpts) => {
 
 const App = () => {
   const [input, setInput] = useState('')
-  const [todos, { add, remove }] = useTodos([])
-  const {loading, data, error} = useFetch(`https://jsonplaceholder.typicode.com/todos`);
+  const [todos, { add, remove, toggleComplete }] = useTodos([])
+  const {loading, data, error} = useFetch(`https://jsonplaceholder.typicode.com/todo`);
 
   useEffect(() => {
     if (loading || error) return;
 
-    add(data.slice(0, 8).map(({ title }) => title));
+    add(data.slice(0, 8).map(({ title, completed }) => ({ completed, text: title })));
   }, [loading, error])
-
   return (
     <div className="App">
-      {loading ? <p>Loading...</p> : error ? <p>Error: {error}</p> : (
+      {loading ? <p>Loading...</p> : error ? <p>Error: <pre>{error.stack}</pre></p> : (
         <ul>
-          {todos.map((todo, i) => (
-            <li key={i}>{todo} <button onClick={() => remove(i)}>X</button></li>
+          {todos.map(({ completed, text }, i) => (
+            <li key={i} className={completed ? 'completed' : ''}>
+              {text}
+              <button onClick={() => toggleComplete(i)}>{completed ? 'Uncomplete' : 'Complete'}</button>
+              <button onClick={() => remove(i)}>X</button>
+            </li>
           ))}
         </ul>
       )}

@@ -17,6 +17,10 @@ ul {
   text-align: left;
 }
 
+.completed {
+  text-decoration: line-through;
+}
+
 input, button {
   font-size: 16px;
   border: 2px solid #333;
