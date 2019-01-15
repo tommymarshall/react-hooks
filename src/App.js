@@ -19,40 +19,65 @@ const useTodos = (initialState) => {
   ]
 };
 
-const App = () => {
-  const [input, setInput] = useState('Add new todo!')
-  const [isLoading, setLoading] = useState(true)
-  const [todos, { add, remove }] = useTodos([])
+const defaultOpts = {};
+const useFetch = (input, opts = defaultOpts) => {
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState([]);
+  const {
+    readBody = body => body.json(),
+    ...init
+  } = opts;
 
-  const getTodos = async (add) => {
-    const res = await fetch(`https://jsonplaceholder.typicode.com/todos`)
-      const json = await res.json()
-      add(json.slice(0, 8).map(({ title }) => title));
-      setLoading(false)
+  const request = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(input, init);
+      if (response.ok) {
+        const body = await readBody(response);
+        setData(body);
+      } else {
+        setError(new Error(response.statusText));
+      }
+    } catch (e) {
+      setError(e);
+    }
+    setLoading(false);
   };
 
   useEffect(() => {
-    getTodos(add)
-  }, []);
+    request();
+  }, [input, opts]);
+  return { error, loading, data };
+};
+
+const App = () => {
+  const [input, setInput] = useState('')
+  const [todos, { add, remove }] = useTodos([])
+  const {loading, data, error} = useFetch(`https://jsonplaceholder.typicode.com/todos`);
+
+  useEffect(() => {
+    if (loading || error) return;
+
+    add(data.slice(0, 8).map(({ title }) => title));
+  }, [loading, error])
 
   return (
     <div className="App">
-      <header className="App-header">
-        {isLoading ? <p>Loading...</p> : (
-          <ul>
-            {todos.map((todo, i) => (
-              <li key={todo}>{todo} <button onClick={() => remove(i)}>X</button></li>
-            ))}
-          </ul>
-        )}
-        <form onSubmit={(e) => e.preventDefault()}>
-          <input value={input} onChange={(e) => setInput(e.target.value)}/>
-          <button onClick={() => {
-            add(input)
-            setInput('')
-          }}>Add</button>
-        </form>
-      </header>
+      {loading ? <p>Loading...</p> : error ? <p>Error: {error}</p> : (
+        <ul>
+          {todos.map((todo, i) => (
+            <li key={todo}>{todo} <button onClick={() => remove(i)}>X</button></li>
+          ))}
+        </ul>
+      )}
+      <form onSubmit={(e) => e.preventDefault()}>
+        <input placeholder="Add todo..." value={input} onChange={(e) => setInput(e.target.value)}/>
+        <button onClick={() => {
+          add(input)
+          setInput('')
+        }}>Add</button>
+      </form>
     </div>
   );
 }
