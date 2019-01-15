@@ -1,10 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+const usePersistentStorage = () => {
+  const [message, setMessage] = useState(false);
+
+  const save = (payload) => {
+    setTimeout(() => {
+      setMessage(`Successfully saved ${payload} to a database.`);
+    }, 1000);
+  };
+
+  return [
+    message,
+    save
+  ];
+};
+
 const useTodos = (initialState) => {
   const [todos, setTodos] = useState(initialState);
 
   const add = (text) => {
+    if (!text) return;
     setTodos([...todos, ...Array.isArray(text) ? [ ...text ] : [ text ]]);
   }
 
@@ -55,6 +71,12 @@ const App = () => {
   const [input, setInput] = useState('')
   const [todos, { add, remove }] = useTodos([])
   const {loading, data, error} = useFetch(`https://jsonplaceholder.typicode.com/todos`);
+  const [message, save] = usePersistentStorage(false);
+
+  useEffect(() => {
+    if (!message) return;
+    alert(message);
+  }, [message])
 
   useEffect(() => {
     if (loading || error) return;
@@ -71,15 +93,20 @@ const App = () => {
           ))}
         </ul>
       )}
-      <form onSubmit={(e) => e.preventDefault()}>
+      <form onSubmit={(e) => {
+        e.preventDefault()
+        if (!input) return;
+
+        add(input)
+        save(input)
+        setInput('')
+      }}>
         <input placeholder="Add todo..." value={input} onChange={(e) => setInput(e.target.value)}/>
-        <button onClick={() => {
-          add(input)
-          setInput('')
-        }}>Add</button>
+        <button>Add</button>
       </form>
     </div>
   );
 }
 
 export default App;
+
