@@ -73,11 +73,11 @@ const App = () => {
   const [elapsedTime, markCompleted] = useModuleTimer()
 
   useEffect(() => {
-    if (loading || error) return
+    if (loading) return
 
     add(data.slice(0, 8).map(({ title }) => title))
     markCompleted()
-  }, [loading, error])
+  }, [loading])
 
   return (
     <div className="App">
