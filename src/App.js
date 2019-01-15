@@ -1,87 +1,87 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
+import React, { useState, useEffect } from 'react'
+import './App.css'
 
 const usePersistentStorage = () => {
-  const [message, setMessage] = useState(false);
+  const [message, setMessage] = useState(false)
 
   const save = (payload) => {
     setTimeout(() => {
-      setMessage(`Successfully saved ${payload} to a database.`);
-    }, 1000);
-  };
+      setMessage(`Successfully saved ${payload} to a database.`)
+    }, 1000)
+  }
 
   return [
     message,
     save
-  ];
-};
+  ]
+}
 
 const useTodos = (initialState) => {
-  const [todos, setTodos] = useState(initialState);
+  const [todos, setTodos] = useState(initialState)
 
   const add = (text) => {
-    if (!text) return;
-    setTodos([...todos, ...Array.isArray(text) ? [ ...text ] : [ text ]]);
+    if (!text) return
+    setTodos([...todos, ...Array.isArray(text) ? [ ...text ] : [ text ]])
   }
 
   const remove = (index) => {
     todos.splice(index, 1)
-    setTodos(todos);
+    setTodos(todos)
   }
 
   return [
     todos,
     { add, remove }
   ]
-};
+}
 
-const defaultOpts = {};
+const defaultOpts = {}
 const useFetch = (input, opts = defaultOpts) => {
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState([]);
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState([])
   const {
     readBody = body => body.json(),
     ...init
-  } = opts;
+  } = opts
 
   const request = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const response = await fetch(input, init);
+      const response = await fetch(input, init)
       if (response.ok) {
-        const body = await readBody(response);
-        setData(body);
+        const body = await readBody(response)
+        setData(body)
       } else {
-        setError(new Error(response.statusText));
+        setError(new Error(response.statusText))
       }
     } catch (e) {
-      setError(e);
+      setError(e)
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   useEffect(() => {
-    request();
-  }, [input, opts]);
-  return { error, loading, data };
-};
+    request()
+  }, [input, opts])
+  return { error, loading, data }
+}
 
 const App = () => {
   const [input, setInput] = useState('')
-  const [todos, { add, remove }] = useTodos([])
-  const {loading, data, error} = useFetch(`https://jsonplaceholder.typicode.com/todos`);
-  const [message, save] = usePersistentStorage(false);
+  const [todos, {add, remove}] = useTodos([])
+  const {loading, data, error} = useFetch(`https://jsonplaceholder.typicode.com/todos`)
+  const [message, save] = usePersistentStorage(false)
 
   useEffect(() => {
-    if (!message) return;
-    alert(message);
+    if (!message) return
+    alert(message)
   }, [message])
 
   useEffect(() => {
-    if (loading || error) return;
+    if (loading || error) return
 
-    add(data.slice(0, 8).map(({ title }) => title));
+    add(data.slice(0, 8).map(({ title }) => title))
   }, [loading, error])
 
   return (
@@ -95,7 +95,7 @@ const App = () => {
       )}
       <form onSubmit={(e) => {
         e.preventDefault()
-        if (!input) return;
+        if (!input) return
 
         add(input)
         save(input)
@@ -105,8 +105,8 @@ const App = () => {
         <button>Add</button>
       </form>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
 
