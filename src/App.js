@@ -1,70 +1,70 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
+import React, { useState, useEffect } from 'react'
+import './App.css'
 
 const useTodos = (initialState) => {
-  const [todos, setTodos] = useState(initialState);
+  const [todos, setTodos] = useState(initialState)
 
   const add = (text) => {
-    setTodos([...todos, ...Array.isArray(text) ? [ ...text ] : [ { text, complete: false } ]]);
+    setTodos([...todos, ...Array.isArray(text) ? [ ...text ] : [ { text, complete: false } ]])
   }
 
   const remove = (index) => {
     todos.splice(index, 1)
-    setTodos(todos);
+    setTodos(todos)
   }
 
   const toggleComplete = (index) => {
-    todos[index].completed = !todos[index].completed;
-    setTodos(todos);
+    todos[index].completed = !todos[index].completed
+    setTodos(todos)
   }
 
   return [
     todos,
     { add, remove, toggleComplete }
   ]
-};
+}
 
-const defaultOpts = {};
+const defaultOpts = {}
 const useFetch = (input, opts = defaultOpts) => {
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState([]);
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState([])
   const {
     readBody = body => body.json(),
     ...init
-  } = opts;
+  } = opts
 
   const request = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const response = await fetch(input, init);
+      const response = await fetch(input, init)
       if (response.ok) {
-        const body = await readBody(response);
-        setData(body);
+        const body = await readBody(response)
+        setData(body)
       } else {
-        setError(new Error("Bad URL probs"));
+        setError(new Error("Bad URL probs"))
       }
     } catch (e) {
-      setError(e);
+      setError(e)
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   useEffect(() => {
-    request();
-  }, [input, opts]);
-  return { error, loading, data };
-};
+    request()
+  }, [input, opts])
+  return { error, loading, data }
+}
 
 const App = () => {
   const [input, setInput] = useState('')
   const [todos, { add, remove, toggleComplete }] = useTodos([])
-  const {loading, data, error} = useFetch(`https://jsonplaceholder.typicode.com/todosss`);
+  const {loading, data, error} = useFetch(`https://jsonplaceholder.typicode.com/todos`)
 
   useEffect(() => {
-    if (loading) return;
+    if (loading) return
 
-    add(data.slice(0, 8).map(({ title, completed }) => ({ completed, text: title })));
+    add(data.slice(0, 8).map(({ title, completed }) => ({ completed, text: title })))
   }, [loading])
 
   return (
@@ -82,16 +82,16 @@ const App = () => {
       )}
       <form onSubmit={(e) => {
           e.preventDefault()
-          if (!input) return;
+          if (!input) return
 
-          add(input);
-          setInput('');
+          add(input)
+          setInput('')
         }}>
         <input placeholder="Add todo..." value={input} onChange={(e) => setInput(e.target.value)}/>
         <button>Add</button>
       </form>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
