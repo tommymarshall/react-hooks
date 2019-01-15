@@ -37,7 +37,7 @@ const useFetch = (input, opts = defaultOpts) => {
         const body = await readBody(response);
         setData(body);
       } else {
-        setError(new Error(response.statusText));
+        setError(new Error("Bad URL probs"));
       }
     } catch (e) {
       setError(e);
@@ -52,6 +52,7 @@ const useFetch = (input, opts = defaultOpts) => {
 };
 
 const useModuleTimer = () => {
+  // window.__START_TIME__
   const start = useRef(new Date());
   const [finished, setFinished] = useState()
 
@@ -80,7 +81,7 @@ const App = () => {
 
   return (
     <div className="App">
-      {loading ? <p>Loading...</p> : error ? <p>Error: {error}</p> : (
+      {loading ? <p>Loading...</p> : error ? <p>Error: {error.message}</p> : (
         <ul>
           {todos.map((todo, i) => (
             <li key={i}>{todo} <button onClick={() => remove(i)}>X</button></li>
