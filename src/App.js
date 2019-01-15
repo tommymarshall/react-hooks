@@ -62,10 +62,11 @@ const App = () => {
   const {loading, data, error} = useFetch(`https://jsonplaceholder.typicode.com/todos`);
 
   useEffect(() => {
-    if (loading || error) return;
+    if (loading) return;
 
     add(data.slice(0, 8).map(({ title, completed }) => ({ completed, text: title })));
-  }, [loading, error])
+  }, [loading])
+
   return (
     <div className="App">
       {loading ? <p>Loading...</p> : error ? <p>Error: <pre>{error.stack}</pre></p> : (
