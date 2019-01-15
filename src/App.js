@@ -67,16 +67,19 @@ const App = () => {
       {loading ? <p>Loading...</p> : error ? <p>Error: {error}</p> : (
         <ul>
           {todos.map((todo, i) => (
-            <li key={todo}>{todo} <button onClick={() => remove(i)}>X</button></li>
+            <li key={i}>{todo} <button onClick={() => remove(i)}>X</button></li>
           ))}
         </ul>
       )}
-      <form onSubmit={(e) => e.preventDefault()}>
+      <form onSubmit={(e) => {
+          e.preventDefault()
+          if (!input) return;
+
+          add(input);
+          setInput('');
+        }}>
         <input placeholder="Add todo..." value={input} onChange={(e) => setInput(e.target.value)}/>
-        <button onClick={() => {
-          add(input)
-          setInput('')
-        }}>Add</button>
+        <button>Add</button>
       </form>
     </div>
   );
