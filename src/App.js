@@ -59,7 +59,7 @@ const useFetch = (input, opts = defaultOpts) => {
 const App = () => {
   const [input, setInput] = useState('')
   const [todos, { add, remove, toggleComplete }] = useTodos([])
-  const {loading, data, error} = useFetch(`https://jsonplaceholder.typicode.com/todos`);
+  const {loading, data, error} = useFetch(`https://jsonplaceholder.typicode.com/todosss`);
 
   useEffect(() => {
     if (loading) return;
@@ -69,7 +69,7 @@ const App = () => {
 
   return (
     <div className="App">
-      {loading ? <p>Loading...</p> : error ? <p>Error: <pre>{error.stack}</pre></p> : (
+      {loading ? <p>Loading...</p> : error ? <p>Error: <pre>{error.message}</pre></p> : (
         <ul>
           {todos.map(({ completed, text }, i) => (
             <li key={i} className={completed ? 'completed' : ''}>
