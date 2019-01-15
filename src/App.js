@@ -1,55 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
+import React from 'react'
+import './App.css'
 
-const useTodos = (initialState) => {
-  const [todos, setTodos] = useState(initialState);
-
-  const add = (text) => {
-    if (!text) return;
-    setTodos([...todos, ...Array.isArray(text) ? [ ...text ] : [ text ]]);
+class App extends React.Component {
+  state = {
+    input: '',
+    todos: []
   }
 
-  const remove = (index) => {
-    todos.splice(index, 1)
-    setTodos(todos);
-  }
-
-  return [
-    todos,
-    { add, remove }
-  ]
-};
-
-const App = () => {
-  const [input, setInput] = useState('')
-  const [todos, { add, remove }] = useTodos([])
-
-  useEffect(() => {
+  componentDidMount() {
     fetch(`https://jsonplaceholder.typicode.com/todos`)
       .then((res) => res.json())
       .then((json) => json.slice(0, 8).map(({ title }) => title))
-      .then((t) => add(t));
-  }, [])
+      .then((t) => this.add(t))
+  }
 
-  return (
-    <div className="App">
-      <ul>
-        {todos.map((todo, i) => (
-          <li key={i}>{todo} <button onClick={() => remove(i)}>X</button></li>
-        ))}
-      </ul>
-      <form onSubmit={(e) => {
-        e.preventDefault()
-        if (!input) return;
+  setInput = (input) => this.setState({ input })
 
-        add(input);
-        setInput('');
-      }>
-        <input placeholder="Add new todo..." value={input} onChange={(e) => setInput(e.target.value)}/>
-        <button>Add</button>
-      </form>
-    </div>
-  );
+  add = (text) => {
+    const { todos } = this.state
+    const newTodos = [...todos, ...Array.isArray(text) ? [ ...text ] : [ text ]]
+    this.setState({
+      todos: newTodos
+    })
+  }
+
+  remove = (index) => {
+    const { todos } = this.state
+    todos.splice(index, 1)
+    this.setState({ todos })
+  }
+
+  render() {
+    const { input, todos } = this.state
+
+    return (
+      <div className="App">
+        <ul>
+          {todos.map((todo, i) => (
+            <li key={i}>{todo} <button onClick={() => this.remove(i)}>X</button></li>
+          ))}
+        </ul>
+        <form onSubmit={(e) => {
+          e.preventDefault()
+          if (!input) return
+
+          this.add(input)
+          this.setInput('')
+        }}>
+          <input placeholder="Add new todo..." value={input} onChange={(e) => this.setInput(e.target.value)}/>
+          <button>Add</button>
+        </form>
+      </div>
+    )
+  }
 }
 
-export default App;
+export default App
