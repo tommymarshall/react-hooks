@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 const useTodos = (initialState) => {
@@ -51,15 +51,31 @@ const useFetch = (input, opts = defaultOpts) => {
   return { error, loading, data };
 };
 
+const useModuleTimer = () => {
+  const start = useRef(new Date());
+  const [finished, setFinished] = useState()
+
+  const markCompleted = () => {
+    setFinished(new Date());
+  };
+
+  return [
+    finished ? finished - start.current : false,
+    markCompleted
+  ]
+}
+
 const App = () => {
   const [input, setInput] = useState('')
   const [todos, { add, remove }] = useTodos([])
   const {loading, data, error} = useFetch(`https://jsonplaceholder.typicode.com/todos`);
+  const [elapsedTime, markCompleted] = useModuleTimer();
 
   useEffect(() => {
     if (loading || error) return;
 
     add(data.slice(0, 8).map(({ title }) => title));
+    markCompleted();
   }, [loading, error])
 
   return (
@@ -81,6 +97,7 @@ const App = () => {
         <input placeholder="Add todo..." value={input} onChange={(e) => setInput(e.target.value)}/>
         <button>Add</button>
       </form>
+      {elapsedTime && <p>{elapsedTime}ms</p>}
     </div>
   );
 }
