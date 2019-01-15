@@ -23,9 +23,8 @@ class App extends React.Component {
 
   add = (text) => {
     const { todos } = this.state
-    const newTodos = [...todos, ...Array.isArray(text) ? [ ...text ] : [ text ]]
     this.setState({
-      todos: newTodos
+      todos: [...todos, ...Array.isArray(text) ? [ ...text ] : [ text ]]
     })
   }
 
