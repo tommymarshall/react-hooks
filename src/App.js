@@ -4,19 +4,14 @@ import './App.css'
 class App extends React.Component {
   state = {
     input: '',
-    loading: true,
     todos: []
   }
 
   componentDidMount() {
-    this.setState({ loading: false })
     fetch(`https://jsonplaceholder.typicode.com/todos`)
       .then((res) => res.json())
       .then((json) => json.slice(0, 8).map(({ title }) => title))
-      .then((t) => {
-        this.add(t)
-        this.setState({ loading: false })
-      })
+      .then((t) => this.add(t))
   }
 
   setInput = (input) => this.setState({ input })
@@ -35,15 +30,13 @@ class App extends React.Component {
   }
 
   render() {
-    const { input, loading, todos } = this.state
+    const { input, todos } = this.state
 
     return (
       <div className="App">
         <ul>
-          {loading ? <p>Loading...</p> : (
-            todos.map((todo, i) =>
-              <li key={i}>{todo} <button onClick={() => this.remove(i)}>X</button></li>
-            )
+          {todos.map((todo, i) =>
+            <li key={i}>{todo} <button onClick={() => this.remove(i)}>X</button></li>
           )}
         </ul>
         <form onSubmit={(e) => {
